@@ -375,11 +375,16 @@ public class rgbRelayScript : MonoBehaviour {
 				yield break;
 			}
 			Debug.LogFormat("[ReGrettaBle Relay #{0}] 3 stages completed! Module disarmed!", _moduleID);
+			KMBombInfo bombInfo = gameObject.GetComponent<KMBombInfo>();
+			if (bombInfo != null && bombInfo.GetTime() < 60f)
+				Module.HandlePass();
+			Vector3 lastRotation = EntireModule.transform.localEulerAngles * 1;
 			for (int i = 0; i < 60; i++)
             {
 				FakedStatusLight.SetActive(i % 4 != 3);
 				foreach (int idx in IdxAncilleryGameObjects)
 					Displays[idx].GetComponent<MeshRenderer>().enabled = i % 4 == 3;
+				EntireModule.transform.localEulerAngles = i % 4 != 3 ? lastRotation : Vector3.zero;
 				int[] glitchy = new int[6];
 				for (int j = 0; j < i / 10; j++)
 				{
@@ -420,11 +425,10 @@ public class rgbRelayScript : MonoBehaviour {
 			}
 			else
 			{
-				KMBombInfo bombInfo = gameObject.GetComponent<KMBombInfo>();
 				if (bombInfo != null && bombInfo.GetModuleIDs().Contains("regretbFiltering"))
 				{
 					Text[1].GetComponent<TextMesh>().text = "BROTHER";
-					Text[2].GetComponent<TextMesh>().text = "SAVEME";
+					Text[2].GetComponent<TextMesh>().text = "HELPME";
 				}
 				else
 				{
