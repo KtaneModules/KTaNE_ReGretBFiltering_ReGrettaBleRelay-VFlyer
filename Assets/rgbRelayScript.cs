@@ -472,7 +472,7 @@ public class rgbRelayScript : MonoBehaviour {
 		string validstages = "123".Substring(0, stagesCompleted + 1);
 		if (command.Length == 1 && validstages.Contains(command[0]))
 		{
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < stagesCompleted + 1; i++)
             {
                 if (command[0] == validstages[i])
                 {
