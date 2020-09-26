@@ -295,8 +295,9 @@ public class rgbRelayScript : MonoBehaviour {
 	private IEnumerator SolveCheck()
 	{
 		checking = true;
-		bool[] checks = new bool[3];
+		bool[] checks = new bool[stagesCompleted + 1];
 		int[] answer = new int[6];
+		int sectionsEach = 6 / (stagesCompleted + 1);
 		/*
 		if ((twitch) && (t < 3))
 		{
@@ -323,12 +324,15 @@ public class rgbRelayScript : MonoBehaviour {
 			answer[i] = finalResult[i / 2] / 16;
 			answer[i + 1] = finalResult[i / 2] % 16;
 		}
-		for (int i = 0; i < 6; i += 2)
+        for (int i = 0; i < checks.Length; i++)
 		{
-			if ((input[i] == answer[i]) && (input[i + 1] == answer[i + 1]))
-			{
-				checks[i / 2] = true;
-			}
+            bool[] partCorrect = new bool[sectionsEach];
+            for (int x = 0; x < partCorrect.Length; x++)
+            {
+				if (input[x + sectionsEach * i] == answer[x + sectionsEach * i])
+                    partCorrect[x] = true;
+            }
+			checks[i] = partCorrect.ToList().TrueForAll(a => a);
 		}
 		for (int i = 0; i < 4; i++)
 		{
