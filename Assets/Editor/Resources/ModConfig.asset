@@ -11,18 +11,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
   m_Name: ModConfig
   m_EditorClassIdentifier: 
-  id: regretbFiltering
-  title: ReGret-B Filtering
-  author: Obvious
-  description: 'Take a break... wait no don''t- ...and the time ran out again.
+  id: regrettableRelay
+  title: ReGrettaBle Relay
+  author: VFlyer, Obvious
+  description: '[i]Taking a break? I don''t need a break yet![/i]
 
 
-    Ok so this is a module in which the time is supposed to run out but still disadvantages
-    you. Oh and it uses colours, without the need of having to identify them.
+    This is a practice variant of ReGret-B Filtering, designed for users who are not
+    comfortable calculating 3 operators within 75 seconds. This module consists of
+    3 stages where you must perform different operators on each stage to disarm the
+    module.
 
-    As always TP is supported (allowing for a 15 second input delay)
+    When you are ready, subscribe to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2172702283]ReGret-B
+    Filtering[/url] for the true challenge.
 
-    You''re allowed to scream at me as long as I get useful feedback :)'
-  version: 1.1
+
+    Original variant by Obvious
+
+    Practice variant by VFlyer, modified for ease of difficulty
+
+'
+  version: 1.0
   outputFolder: build
-  previewImage: {fileID: 2800000, guid: 8181b4b492ecaf7408d16762c2ec0680, type: 3}
+  previewImage: {fileID: 2800000, guid: d339a21694eae32448dd5ab82481db82, type: 3}

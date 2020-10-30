@@ -424,8 +424,8 @@ public class rgbRelayScript : MonoBehaviour {
 
 			if (input.Count(x => x == 0) == 6 || input.Count(x => x == 15) == 6)
 			{
-				Text[1].GetComponent<TextMesh>().text = "GOOD JOB";
-				Text[2].GetComponent<TextMesh>().text = "IGUESS";
+				Text[1].GetComponent<TextMesh>().text = "RESIDENT";
+				Text[2].GetComponent<TextMesh>().text = "SLEEP";
 			}
 			else
 			{
