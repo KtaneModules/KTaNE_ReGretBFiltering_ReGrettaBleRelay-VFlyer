@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
+using System.Text.RegularExpressions;
 
 public class rgbRelayScript : MonoBehaviour {
 
@@ -28,11 +29,11 @@ public class rgbRelayScript : MonoBehaviour {
 	private int selected = 0;
 	private int[] input = new int[6];
 	private int index = 0;
-	private int t;
+	//private int t;
 
 	private bool solved = false;
 	private bool checking = false;
-	private bool twitch = false;
+	//private bool twitch = false;
 
 	static int _moduleIdCounter = 1;
 	int _moduleID = 0;
@@ -107,26 +108,28 @@ public class rgbRelayScript : MonoBehaviour {
 
 	int[] IdxAncilleryGameObjects = { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 38 },
         idxPossibleOperators = { 0, 1, 2, 3, 4, 5 },
-		idxEasyOperators = { 3, 4, 5 };
+		idxLogicOperators = { 3, 4, 5 };
 	int[][] givenStageValues = new int[3][];
 	void Start()
     {
-		idxPossibleOperators.Shuffle();
+		int[] idxNonLogicOperators = idxPossibleOperators.Where(a => !idxLogicOperators.Contains(a)).ToArray().Shuffle();
+		idxLogicOperators.Shuffle();
 		var pos = 0;
 		for (int x = 0; x < 3; x++)
 		{
 			int[] attachedOperator = new int[x + 1];
-			for (int y = 0; y <= x; y++)
+			attachedOperator[0] = idxLogicOperators[x]; // Attach a logical operator onto the module. This can typically be brute forced with some calculators.
+			for (int y = 1; y <= x; y++)
 			{
-				attachedOperator[y] = idxPossibleOperators[pos];
+				attachedOperator[y] = idxNonLogicOperators[pos];
 				pos++;
 			}
-			givenStageValues[x] = attachedOperator.ToArray();
+			givenStageValues[x] = attachedOperator.Shuffle().ToArray();
 		}
 		Stagegen();
 		foreach (int idx in IdxAncilleryGameObjects)
 			Displays[idx].GetComponent<MeshRenderer>().enabled = false;
-		EntireModule.transform.Rotate(0, new[] { 90, 180, -90 }.PickRandom(), 0);
+		EntireModule.transform.Rotate(0, new[] { 90, -90 }.PickRandom(), 0);
 	}
 	
 	private void ActivateModule ()
@@ -173,13 +176,13 @@ public class rgbRelayScript : MonoBehaviour {
 			stageResult = StageCalc(a, stageResult);
 			Debug.LogFormat("[ReGrettaBle Relay #{0}] Applied {1}, resulting in {2}.", _moduleID, operand[operators[a]] + " " + hexconv[stagesR[a] / 16] + hexconv[stagesR[a] % 16] + hexconv[stagesG[a] / 16] + hexconv[stagesG[a] % 16] + hexconv[stagesB[a] / 16] + hexconv[stagesB[a] % 16], stageResult.Select(x => hexconv[x / 16] + hexconv[x % 16]).Join(""));
 		}
-		/*
+		/* // Commented out due to inefficiency.
 		Debug.LogFormat("[ReGrettaBle Relay #{0}] Applied {1}, resulting in {2}.", _moduleID, operand[operators[0]] + " " + hexconv[stagesR[0] / 16] + hexconv[stagesR[0] % 16] + hexconv[stagesG[0] / 16] + hexconv[stagesG[0] % 16] + hexconv[stagesB[0] / 16] + hexconv[stagesB[0] % 16], StageCalc(0, initCol).Select(x => hexconv[x / 16] + hexconv[x % 16]).Join(""));
 		Debug.LogFormat("[ReGrettaBle Relay #{0}] Applied {1}, resulting in {2}.", _moduleID, operand[operators[1]] + " " + hexconv[stagesR[1] / 16] + hexconv[stagesR[1] % 16] + hexconv[stagesG[1] / 16] + hexconv[stagesG[1] % 16] + hexconv[stagesB[1] / 16] + hexconv[stagesB[1] % 16], StageCalc(1, StageCalc(0, initCol)).Select(x => hexconv[x / 16] + hexconv[x % 16]).Join(""));
 		Debug.LogFormat("[ReGrettaBle Relay #{0}] Applied {1}, resulting in {2}.", _moduleID, operand[operators[2]] + " " + hexconv[stagesR[2] / 16] + hexconv[stagesR[2] % 16] + hexconv[stagesG[2] / 16] + hexconv[stagesG[2] % 16] + hexconv[stagesB[2] / 16] + hexconv[stagesB[2] % 16], StageCalc(2, StageCalc(1, StageCalc(0, initCol))).Select(x => hexconv[x / 16] + hexconv[x % 16]).Join(""));
 		*/
 	}
-	
+	/* // Unused due to not allowing timer.
 	private void Stageshift ()
 	{
 		initCol = StageCalc(0, initCol);
@@ -199,7 +202,7 @@ public class rgbRelayScript : MonoBehaviour {
 		Debug.LogFormat("[ReGrettaBle Relay #{0}] Applied {1}, resulting in {2}.", _moduleID, operand[operators[2]] + " " + hexconv[stagesR[2] / 16] + hexconv[stagesR[2] % 16] + hexconv[stagesG[2] / 16] + hexconv[stagesG[2] % 16] + hexconv[stagesB[2] / 16] + hexconv[stagesB[2] % 16], StageCalc(2, StageCalc(1, StageCalc(0, initCol))).Select(x => hexconv[x / 16] + hexconv[x % 16]).Join(""));
 		DispUpdate();
 	}
-
+	*/
 	private void DispUpdate ()
 	{
 		string[] hexconv = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
@@ -252,8 +255,8 @@ public class rgbRelayScript : MonoBehaviour {
 			return (int)(2f / (1f / value[0] + 1f / value[1]) + 0.000000001f);
 		}
 	}
-
-	private IEnumerator KeepingPace()
+	/*
+	private IEnumerator KeepingPace() // Unused since no time limit
 	{
 		t = -1;
 		while (!solved)
@@ -284,21 +287,21 @@ public class rgbRelayScript : MonoBehaviour {
 			}
 		}
 	}
-
+	 // Unused since status light is replaced
 	private IEnumerator Statuslight()
     {
 		Displays[38].GetComponent<MeshRenderer>().material.color = new Color(StageCalc(2, StageCalc(1, StageCalc(0, initCol)))[0] / 255f, StageCalc(2, StageCalc(1, StageCalc(0, initCol)))[1] / 255f, StageCalc(2, StageCalc(1, StageCalc(0, initCol)))[2] / 255f);
 		yield return new WaitForSeconds(0.5f);
         Displays[38].GetComponent<MeshRenderer>().material.color = new Color32(159, 159, 192, 255);
 	}
-
+	*/
 	private IEnumerator SolveCheck()
 	{
 		checking = true;
 		bool[] checks = new bool[stagesCompleted + 1];
 		int[] answer = new int[6];
 		int sectionsEach = 6 / (stagesCompleted + 1);
-		/*
+		/* // Not used since this version does not need a mercy timer.
 		if ((twitch) && (t < 3))
 		{
 			for (int i = 0; i < 6; i += 2)
@@ -383,12 +386,15 @@ public class rgbRelayScript : MonoBehaviour {
 			if (bombInfo != null && bombInfo.GetTime() < 60f)
 				Module.HandlePass();
 			Vector3 lastRotation = EntireModule.transform.localEulerAngles * 1;
+			int[] solveFlickerCnts = { 1, 5, 13, 21, 31, 41, 51, 53, 55, 57, 59 };
 			for (int i = 0; i < 60; i++)
             {
-				FakedStatusLight.SetActive(i % 4 != 3);
+				var isMimiking = !solveFlickerCnts.Contains(i);
+
+				FakedStatusLight.SetActive(isMimiking);
 				foreach (int idx in IdxAncilleryGameObjects)
-					Displays[idx].GetComponent<MeshRenderer>().enabled = i % 4 == 3;
-				EntireModule.transform.localEulerAngles = i % 4 != 3 ? lastRotation : Vector3.zero;
+					Displays[idx].GetComponent<MeshRenderer>().enabled = !isMimiking;
+				EntireModule.transform.localEulerAngles = isMimiking ? lastRotation : Vector3.zero;
 				int[] glitchy = new int[6];
 				for (int j = 0; j < i / 10; j++)
 				{
@@ -406,6 +412,9 @@ public class rgbRelayScript : MonoBehaviour {
 				yield return new WaitForSeconds(0.05f);
             }
 			FakedStatusLight.SetActive(false);
+			foreach (int idx in IdxAncilleryGameObjects)
+				Displays[idx].GetComponent<MeshRenderer>().enabled = true;
+			EntireModule.transform.localEulerAngles = Vector3.zero;
 			foreach (GameObject obj in Displays)
 			{
 				obj.GetComponent<MeshRenderer>().material.color = new Color((input[0] * 16 + input[1]) / 255f, (input[2] * 16 + input[3]) / 255f, (input[4] * 16 + input[5]) / 255f);
@@ -451,7 +460,7 @@ public class rgbRelayScript : MonoBehaviour {
 			Debug.LogFormat("[ReGrettaBle Relay #{0}] Submitted {1}, which is incorrect!.", _moduleID, input.Take(index).Select(x => hexconv[x]).Join(""));
 			Module.HandleStrike();
 			//StartCoroutine(Statuslight());
-			t = -1;
+			//t = -1;
 			checking = false;
 			index = 0;
 			for (int i = 0; i < 3; i++)
@@ -465,71 +474,72 @@ public class rgbRelayScript : MonoBehaviour {
 
 
 #pragma warning disable 414
-	private string TwitchHelpMessage = "\"!{0} 1\" to move to stage 1. \"!{0} #D42069\" to insert hex code #D42069.";
+	private string TwitchHelpMessage = "Move to step 1,2, or 3 on the module with \"!{0} step 1/2/3\" or \"!{0} 1/2/3\". Submit the hex-code #D42069 with \"!{0} #D42069\" or \"!{0} submit #D42069\"";
 #pragma warning restore 414
 	IEnumerator ProcessTwitchCommand(string command)
 	{
+		if (solved || checking)
+        {
+			yield return string.Format("sendtochaterror The module is not accepting inputs at this moment.");
+			yield break;
+		}
 		yield return null;
-		twitch = true;
+		//twitch = true;
 		command = command.ToLowerInvariant();
 		string validcmds = "0123456789abcdef";
 		string validstages = "123".Substring(0, stagesCompleted + 1);
-		if (command.Length == 1 && validstages.Contains(command[0]))
+		if (Regex.IsMatch(command, @"^(submit\s)?#["+ validcmds + "]{6}$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
 		{
-            for (int i = 0; i < stagesCompleted + 1; i++)
+			string valueMatched = Regex.Match(command, @"#[" + validcmds + "]{6}", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant).Value.Substring(1);
+			//Debug.Log(valueMatched);
+
+            for (int x = 0; x < valueMatched.Length; x++)
             {
-                if (command[0] == validstages[i])
-                {
-                    while (selected != i)
-                    {
-						if(i > selected)
-                        {
-							StageButtons[1].OnInteract();
-                        }
-                        else
-                        {
-							StageButtons[0].OnInteract();
-						}
-						yield return null;
-					}
-                }
+				yield return null;
+				int idx = validcmds.IndexOf(valueMatched.ToLower()[x]);
+				SubButtons[idx].OnInteract();
+			}
+            if (checking)
+            {
+                yield return "strike";
+                yield return "solve";
             }
+		}
+		else if (Regex.IsMatch(command, @"^(step\s)?\d$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+		{
+			string valueMatched = Regex.Match(command, @"\d", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant).Value;
+			int intProcessed;
+			if (!int.TryParse(valueMatched, out intProcessed) || !validstages.Contains(valueMatched) || intProcessed <= 0)
+			{
+				yield return string.Format("sendtochaterror The specified step {0} is currently not accessible.", valueMatched);
+				yield break;
+			}
+			intProcessed--;
+			if (selected == intProcessed)
+            {
+				yield return string.Format("sendtochaterror I am already showing step {0}!", valueMatched);
+				yield break;
+			}
+			while (selected != intProcessed)
+            {
+				yield return null;
+				if (selected > intProcessed)
+					StageButtons[0].OnInteract();
+				else
+					StageButtons[1].OnInteract();
+            }
+
 		}
 		else
 		{
-			if (command.Length != 7 || command[0] != '#')
-			{
-				yield return "sendtochaterror Invalid command.";
-				yield break;
-			}
-			for (int i = 1; i < 7; i++)
-			{
-				if (!validcmds.Contains(command[i]))
-				{
-					yield return "sendtochaterror Invalid command.";
-					yield break;
-				}
-			}
-			for (int i = 1; i < 7; i++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					if (validcmds[j] == command[i])
-					{
-						SubButtons[j].OnInteract();
-						yield return null;
-					}
-				}
-			}
-			yield return "strike";
-			yield return "solve";
-		}
-		yield return null;
+			yield return string.Format("sendtochaterror I do not know a command for \"{0}\"", command);
+			yield break;
+        }
 	}
 	IEnumerator TwitchHandleForcedSolve()
 	{
 		yield return null;
-		twitch = true;
+		//twitch = true;
 		while (stagesCompleted < 3 && !solved)
 		{
 			while (checking)

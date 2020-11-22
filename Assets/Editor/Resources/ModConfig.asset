@@ -17,10 +17,11 @@ MonoBehaviour:
   description: '[i]Taking a break? I don''t need a break yet![/i]
 
 
-    This is a practice variant of ReGret-B Filtering, designed for users who are not
-    comfortable calculating 3 operators within 75 seconds. This module consists of
-    3 stages where you must perform different operators on each stage to disarm the
-    module.
+    This is originally a practice variant of ReGret-B Filtering, designed for users
+    who are not comfortable calculating 3 operators within 75 seconds. This module
+    consists of 3 stages where you must perform different operators on each stage
+    to disarm the module. Each operator is unique like RrGret-B Filtering however
+    you will have to do at least 1 of these rather than being able to wait it out.
 
     When you are ready, subscribe to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2172702283]ReGret-B
     Filtering[/url] for the true challenge.
