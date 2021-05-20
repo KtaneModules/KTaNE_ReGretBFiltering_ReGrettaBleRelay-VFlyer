@@ -217,17 +217,17 @@ public class rgbRelayScript : MonoBehaviour {
 	{
 		switch (operators[stage])
 		{
-			case 0:
+			case 0: // Additive Average
 				return new int[3] { (stagesR[stage] + colour[0]) / 2, (stagesG[stage] + colour[1]) / 2, (stagesB[stage] + colour[2]) / 2 };
-			case 1:
+			case 1: // Multiplicative Average
 				return new int[3] { Sqrt(stagesR[stage] * colour[0]), Sqrt(stagesG[stage] * colour[1]), Sqrt(stagesB[stage] * colour[2]) };
-			case 2:
+			case 2: // Inverse Average
 				return new int[3] { InvAvg(new int[] { stagesR[stage], colour[0] }), InvAvg(new int[] { stagesG[stage], colour[1] }), InvAvg(new int[] { stagesB[stage], colour[2] }) };
-			case 3:
+			case 3: // XOR
 				return new int[3] { (stagesR[stage] ^ colour[0]), (stagesG[stage] ^ colour[1]), (stagesB[stage] ^ colour[2]) };
-			case 4:
+			case 4: // AND
 				return new int[3] { (stagesR[stage] & colour[0]), (stagesG[stage] & colour[1]), (stagesB[stage] & colour[2]) };
-			default:
+			default: // OR
 				return new int[3] { (stagesR[stage] | colour[0]), (stagesG[stage] | colour[1]), (stagesB[stage] | colour[2]) };
 		}
 	}
@@ -252,7 +252,19 @@ public class rgbRelayScript : MonoBehaviour {
 		}
 		else
 		{
-			return (int)(2f / (1f / value[0] + 1f / value[1]) + 0.000000001f);
+			/*
+			 * Note: The original function to calculate that is 2 / r = 1 / a + 1 / b
+			 * To isolate r:
+			 * 2 / r = 1 / a + 1 / b
+			 * 2 / r = 1 / a * (b / b) + 1 / b * (a / a)
+			 * 2 / r = b / (a * b) + a / (a * b)
+			 * 2 / r = (b + a) / (a * b)
+			 * r * (b + a) = 2 * a * b
+			 * r = 2 * a * b / (a + b)
+			 */
+
+			//return (int)(2f / (1f / value[0] + 1f / value[1]) + 0.000000001f);
+			return 2 * value[0] * value[1] / (value[0] + value[1]);
 		}
 	}
 	/*
@@ -386,7 +398,7 @@ public class rgbRelayScript : MonoBehaviour {
 			if (bombInfo != null && bombInfo.GetTime() < 60f)
 				Module.HandlePass();
 			Vector3 lastRotation = EntireModule.transform.localEulerAngles * 1;
-			int[] solveFlickerCnts = { 1, 5, 13, 21, 31, 41, 51, 53, 55, 57, 59 };
+			int[] solveFlickerCnts = { 1, 5, 13, 21, 31, 41, 50, 53, 56, 59 };
 			for (int i = 0; i < 60; i++)
             {
 				var isMimiking = !solveFlickerCnts.Contains(i);
